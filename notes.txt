@@ -1,0 +1,86 @@
+Les exceptions : C'est avoir un plan B quand quelque chose peut mal se passer
+Les décorateurs : C'est ajouter des super-pouvoirs à tes fonctions sans les modifier
+Ces deux concepts te permettent d'écrire du code plus robuste et plus propre !
+
+🚨 La gestion des exceptions (les erreurs)
+Le problème
+Imagine que tu écris un programme qui doit ouvrir un fichier sur ton ordinateur. 
+Mais si le fichier n'existe pas, ton programme va planter complètement et s'arrêter. 
+C'est comme si tu essayais d'ouvrir une porte qui n'existe pas - ça ne marche pas !
+
+La solution : try/except
+C'est comme avoir un plan B ! Tu dis à ton programme : "Essaie de faire ça, mais si ça marche pas, fais ça à la place."
+
+# Sans protection (le programme plante)
+with open("fichier_inexistant.txt") as f:
+    print(f.read())
+print("Cette ligne ne s'affichera jamais si le fichier n'existe pas")
+
+# Avec protection (le programme continue)
+try:
+    with open("fichier_inexistant.txt") as f:
+        print(f.read())
+except Exception as e:
+    print("Oups, le fichier n'existe pas !")
+print("Cette ligne s'affichera quand même")
+
+Ne compte pas sur les erreurs pour gérer ton programme ! 
+C'est mieux de vérifier avant :
+
+import os
+if os.path.isfile("fichier.txt"):  # Je vérifie d'abord si le fichier existe
+    with open("fichier.txt") as f:
+        print(f.read())
+
+
+🎭 Les décorateurs de fonctions
+C'est quoi ?
+Un décorateur, c'est comme un emballage cadeau pour tes fonctions. 
+Il ajoute des fonctionnalités supplémentaires sans modifier la fonction originale.
+Exemple concret : mesurer le temps
+Imagine que tu veux savoir combien de temps prend chacune de tes fonctions :
+
+Sans décorateur (répétitif et pénible)
+import time
+
+def ma_fonction():
+    print("Je fais quelque chose...")
+    time.sleep(2)
+
+# À chaque fois, je dois écrire ça :
+start = time.time()
+ma_fonction()
+end = time.time()
+print(f"Temps : {end - start}s")
+
+
+Avec un décorateur (magique !)
+def chronometer(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        func(*args, **kwargs)  # J'exécute la vraie fonction
+        end = time.time()
+        print(f"Temps d'exécution : {end - start:.3f}s")
+    return wrapper
+
+@chronometer  # Je "décore" ma fonction
+def ma_fonction():
+    print("Je fais quelque chose...")
+    time.sleep(2)
+
+# Maintenant, le temps s'affiche automatiquement !
+ma_fonction()
+Comment ça marche ?
+
+Le @chronometer dit : "Quand quelqu'un appelle ma_fonction(), passe d'abord par chronometer"
+chronometer crée une fonction wrapper qui fait le travail supplémentaire (mesurer le temps)
+wrapper appelle ta vraie fonction au milieu
+C'est comme un sandwich : temps → ta fonction → temps
+
+Avec des paramètres
+Si ta fonction a besoin de paramètres, pas de problème :
+@chronometer
+def dire_bonjour(nom, age):
+    print(f"Bonjour {nom}, tu as {age} ans !")
+
+dire_bonjour("Alice", 16)  # Les paramètres passent à travers le décorateur
